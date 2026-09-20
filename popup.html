@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { width: 380px; font-family: Arial, sans-serif; padding: 10px; margin: 0; color: #222; }
+  h3 { margin: 0 0 6px; color: #333; }
+  .sub { font-size: 11px; color: #777; margin-bottom: 10px; }
+  fieldset { border: 1px solid #ddd; border-radius: 6px; margin-bottom: 10px; }
+  legend { font-size: 12px; font-weight: bold; padding: 0 4px; }
+  label { display: block; margin: 6px 0 2px; font-size: 12px; font-weight: bold; }
+  input[type=text], input[type=number], textarea {
+    width: 100%; padding: 6px; box-sizing: border-box; margin-bottom: 4px;
+    font-family: monospace; font-size: 11px;
+  }
+  textarea { resize: vertical; min-height: 40px; }
+  .row { display: flex; gap: 6px; }
+  .row > div { flex: 1; }
+  .tabs { display: flex; margin-bottom: 8px; }
+  .tab-btn { flex: 1; padding: 6px; text-align: center; cursor: pointer; background: #eee; font-size: 12px; }
+  .tab-btn.active { background: #d9534f; color: white; font-weight: bold; }
+  .mode-panel { display: none; }
+  .mode-panel.active { display: block; }
+  button { width: 100%; padding: 8px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 4px; }
+  #authorizeBtn { background: #5bc0de; color: white; }
+  #startScan { background: #d9534f; color: white; }
+  #startScan:disabled { background: #ccc; cursor: not-allowed; }
+  #stopScan { background: #777; color: white; }
+  .export-row { display: flex; gap: 6px; }
+  .export-row button { background: #5cb85c; color: white; font-size: 11px; padding: 5px; }
+  #logs {
+    margin-top: 10px; max-height: 220px; overflow-y: auto; background: #f8f9fa;
+    border: 1px solid #ddd; padding: 5px; font-family: monospace; font-size: 10.5px; white-space: pre-wrap;
+  }
+  .consent { display: flex; align-items: flex-start; gap: 6px; font-size: 11px; margin-top: 6px; }
+  .consent input { width: auto; margin-top: 2px; }
+  .status-ok { color: #2a8a2a; }
+  .status-bad { color: #c9302c; }
+</style>
+</head>
+<body>
+  <h3>🎯 IDOR &amp; Authorization Scanner</h3>
+  <div class="sub">For authorized security testing on in-scope targets only.</div>
+
+  <fieldset>
+    <legend>1. Scope</legend>
+    <label>Target origin (e.g. https://example.com)</label>
+    <input type="text" id="targetOrigin" placeholder="https://example.com">
+    <button id="authorizeBtn">Request permission for this origin</button>
+    <div id="scopeStatus" class="sub">No permission granted yet.</div>
+    <div class="consent">
+      <input type="checkbox" id="consentBox">
+      <label style="font-weight:normal;margin:0;">I have written authorization to test this exact target and will stay within the agreed scope and rate limits.</label>
+    </div>
+  </fieldset>
+
+  <div class="tabs">
+    <div class="tab-btn active" data-mode="enum">ID Enumeration</div>
+    <div class="tab-btn" data-mode="diff">Auth Diff (Autorize-style)</div>
+  </div>
+
+  <div id="panel-enum" class="mode-panel active">
+    <fieldset>
+      <legend>2. Enumeration config</legend>
+      <label>URL pattern (use {{ID}} where the identifier goes)</label>
+      <input type="text" id="urlPatternEnum" value="https://example.com/api/orders/{{ID}}">
+      <div class="row">
+        <div><label>Start ID</label><input type="number" id="startId" value="1000"></div>
+        <div><label>End ID</label><input type="number" id="endId" value="1020"></div>
+      </div>
+      <label>Known-invalid baseline ID (for response diffing)</label>
+      <input type="number" id="baselineId" value="999999999">
+      <label>Delay between requests (ms)</label>
+      <input type="number" id="delayEnum" value="300">
+    </fieldset>
+  </div>
+
+  <div id="panel-diff" class="mode-panel">
+    <fieldset>
+      <legend>2. Auth-diff config</legend>
+      <label>URL pattern (use {{ID}} where the identifier goes)</label>
+      <input type="text" id="urlPatternDiff" value="https://example.com/api/orders/{{ID}}">
+      <div class="row">
+        <div><label>Start ID</label><input type="number" id="startIdDiff" value="1000"></div>
+        <div><label>End ID</label><input type="number" id="endIdDiff" value="1005"></div>
+      </div>
+      <label>Session B — Cookie header value (from a second, lower-privileged test account)</label>
+      <textarea id="sessionBCookie" placeholder="sessionid=abc123; other=xyz"></textarea>
+      <label>Session B — Authorization header (optional, for token/bearer auth)</label>
+      <input type="text" id="sessionBAuth" placeholder="Bearer eyJ...">
+      <label>Delay between requests (ms)</label>
+      <input type="number" id="delayDiff" value="400">
+    </fieldset>
+  </div>
+
+  <button id="startScan" disabled>Start Scan</button>
+  <button id="stopScan" style="display:none;">Stop</button>
+
+  <div class="export-row">
+    <button id="exportCsv">Export CSV</button>
+    <button id="exportJson">Export JSON</button>
+  </div>
+
+  <div id="logs">Waiting to start...</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

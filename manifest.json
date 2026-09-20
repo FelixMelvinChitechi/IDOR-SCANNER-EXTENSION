@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "IDOR & Authorization Scanner",
+  "version": "2.0.0",
+  "description": "Scope-gated IDOR enumeration and Autorize-style dual-session authorization diffing for authorized security testing only.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage",
+    "declarativeNetRequest"
+  ],
+  "optional_host_permissions": [
+    "*://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  }
+}
