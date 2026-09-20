@@ -68,3 +68,21 @@ CSV/JSON export buttons dump `lastResults` for pasting into your
   agreed rate limits and only test IDs/accounts covered by your scope.
 - Session B override only works for cookie- or header-based auth. It won't
   help with more exotic auth schemes (mTLS, signed request schemes, etc.).
+
+  Download and extract the zip
+Click the file card above to download idor-scanner-extension.zip to your Windows Downloads folder. Right-click it and choose "Extract All..." — do not try to load the .zip itself into Chrome, it needs to be a plain folder first. Pick a permanent location (not Downloads, since you might clear it later) — something like C:\Users\<you>\Tools\idor-scanner-extension.
+
+Open Chrome's extensions page
+Open Chrome and go to chrome://extensions in the address bar (type it directly, it won't show up as a search suggestion).
+
+Turn on Developer mode
+There's a toggle labeled "Developer mode" in the top-right corner of the extensions page. Switch it on — this unlocks the "Load unpacked" option, which is how you install an extension that isn't from the Chrome Web Store.
+
+Load the unpacked extension
+Click "Load unpacked" (top-left) and select the extracted idor-scanner-extension folder itself (the one containing manifest.json, popup.html, etc. — not its parent, and not a zip). Chrome will install it immediately and show its icon.
+
+Pin it and check for errors
+Click the puzzle-piece icon in Chrome's toolbar and pin the scanner so it's always visible. If the extensions page shows an "Errors" button in red on the card, click it — that'll show any typo or manifest issue rather than failing silently.
+
+Grant scope permission before scanning
+Open the target site's tab, log in, click the extension icon, enter the target origin, and click "Request permission for this origin." Chrome will show a permission popup — accept it, then tick the authorization checkbox to unlock Start Scan.
